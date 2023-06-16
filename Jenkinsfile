@@ -10,26 +10,34 @@ pipeline {
 
         stage('Build') {
             environment {
-                // Set the Go version to 1.20.4
-                GOLANG_VERSION = '1.20.4'
+                GO_VERSION = '1.20.4'
             }
             steps {
-                sh 'go version' // Verify the Go version
-                sh 'go build -o myapp' // Build the binary artifact
+                sh '''
+                    # Install Go
+                    curl -O https://dl.google.com/go/go$GO_VERSION.linux-amd64.tar.gz
+                    tar -xvf go$GO_VERSION.linux-amd64.tar.gz
+                    export PATH=$PATH:/path/to/go/bin
+
+                    # Build the Go application
+                    go build -o app
+                '''
             }
         }
 
         stage('Test') {
             steps {
-                sh 'go test -v ./...' // Run tests
+                sh '''
+                    # Run the tests
+                    go test -v ./...
+                '''
             }
         }
-    }
 
-    post {
-        success {
-            // Archive the binary artifact
-            archiveArtifacts artifacts: 'myapp'
+        stage('Produce Artefact') {
+            steps {
+                sh 'cp app /path/to/artefacts'
+            }
         }
     }
 }
