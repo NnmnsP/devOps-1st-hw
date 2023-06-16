@@ -34,9 +34,21 @@ pipeline {
             }
         }
 
-        stage('Produce Artefact') {
+        stage('Produce Artifact') {
             steps {
-                sh 'cp app /path/to/artefacts'
+                sh 'cp app /path/to/artifacts'
+            }
+        }
+
+        stage('Deploy to Target VM') {
+            steps {
+                sh '''
+                    # Copy the artifact to the target VM
+                    scp /path/to/artifacts/app user@target-vm:/path/to/deployment/
+
+                    # SSH into the target VM and start the application
+                    ssh user@target-vm "nohup /path/to/deployment/app > /dev/null 2>&1 &"
+                '''
             }
         }
     }
